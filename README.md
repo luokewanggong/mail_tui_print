@@ -7,7 +7,7 @@
   
   2.使用 chmod +x mail_tui_print  #授予权限
   
-  3. ./mail_tui_print             #执行程序
+  3.  ./mail_tui_print             #执行程序
   
   
 # window系统系统自动收到邮件下载并连接打印机打印
