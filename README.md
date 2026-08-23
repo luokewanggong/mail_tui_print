@@ -1,0 +1,2 @@
+# mail_tui_print
+Linux系统自动收到邮件下载并连接打印机打印
