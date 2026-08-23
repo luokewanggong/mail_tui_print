@@ -1,8 +1,7 @@
 #!/bin/bash
-# MailTUI 远程内存运行版｜兼容 bash <(wget) 进程替换
-SCRIPT_VER="mailtui‑remote‑v2.3"
+# MailTUI 远程内存运行版｜兼容 bash <(wget)
+SCRIPT_VER="mailtui‑remote‑v2.3‑oldui"
 
-# ========== 仿照V2RAY：写死绝对工作目录，彻底避开 /dev/fd 路径坑 ==========
 BASE_DIR="/opt/mailtui"
 mkdir -p "${BASE_DIR}"
 cd "${BASE_DIR}" || exit 1
@@ -12,7 +11,6 @@ LOG_FILE="${BASE_DIR}/mail_tui.log"
 SAVE_DIR="${BASE_DIR}/mail_download"
 ATTACH_DIR="${SAVE_DIR}/attachments"
 
-# 初始化数据目录
 mkdir -p "${SAVE_DIR}" "${ATTACH_DIR}"
 
 log(){
@@ -28,16 +26,15 @@ clear_menu(){
     clear
 }
 
-# 禁用cups打印机检测
 check_printer(){
-    log "ℹ️跳过打印机检测"
+    log "ℹ️跳过打印机检测(未安装cups)"
     return 1
 }
 
 extract_attachments(){
     local eml_file="$1"
     if ! command -v munpack &>/dev/null;then
-        log "⚠️未检测munpack，请安装mpack，无法解析附件"
+        log "⚠️未检测到munpack，跳过附件解析，请安装 mpack"
         return 1
     fi
     [ ! -f "${eml_file}" ] && return 1
@@ -51,6 +48,7 @@ extract_attachments(){
 }
 
 download_mail_imap(){
+    mkdir -p "${SAVE_DIR}" "${ATTACH_DIR}"
     log "开始执行IMAP邮件下载任务"
     if [ ! -f "${CONFIG_FILE}" ];then
         log "ERROR:配置文件不存在，请先配置邮箱"
@@ -111,6 +109,7 @@ load_config(){
         AUTH_CODE=""
         POLL_INTERVAL=60
     fi
+    mkdir -p "${SAVE_DIR}" "${ATTACH_DIR}"
 }
 
 ui_config_mail(){
@@ -125,7 +124,7 @@ ui_config_mail(){
     read -p "授权码: " AUTH_CODE
     read -p "轮询间隔(秒): " POLL_INTERVAL
     save_config
-    echo "配置保存完成！路径：${CONFIG_FILE}"
+    echo "配置保存完成！"
     pause
 }
 
@@ -140,7 +139,8 @@ ui_show_config(){
     echo "SMTP端口:      ${SMTP_PORT}"
     echo "授权码:        ${AUTH_CODE:0:8}******"
     echo "轮询间隔(秒):  ${POLL_INTERVAL}"
-    echo "工作目录:      ${BASE_DIR}"
+    echo "邮件目录:      ${SAVE_DIR}"
+    echo "附件目录:      ${ATTACH_DIR}"
     pause
 }
 
@@ -156,7 +156,7 @@ ui_show_files(){
 
 ui_view_log(){
     clear_menu
-    echo "============运行日志【${LOG_FILE}】============"
+    echo "============运行日志============"
     if [ ! -f "${LOG_FILE}" ];then
         echo "暂无日志"
     else
@@ -205,7 +205,6 @@ main_menu(){
     while true;do
         clear_menu
         echo "==== MailTUI 邮件附件下载工具 ===="
-        echo " 数据目录：${BASE_DIR}"
         if is_daemon_run;then
             echo " 🟢后台轮询:运行中"
         else
