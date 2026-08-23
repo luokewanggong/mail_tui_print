@@ -1,2 +1,4 @@
 # mail_tui_print
 Linux系统自动收到邮件下载并连接打印机打印
+# MailAutoPrintWinExE.exe
+window系统系统自动收到邮件下载并连接打印机打印
